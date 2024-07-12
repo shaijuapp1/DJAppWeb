@@ -1,0 +1,229 @@
+
+{% extends "base.html" %} 
+{% block title %}Home{% endblock%}
+{% load static %}
+
+{% block content%}
+{% csrf_token %}
+{% verbatim %}
+<style>
+    .select2-container--open {
+        z-index: 9999999
+    }
+</style>
+<div class="card my-4" ng-app="docApp"  ng-controller="AppListCtrl" ng-init="init()" >
+    <h5 class="card-header">App Details</h5>
+    <div class="card-body" style="padding:30px">
+        <form action="addrecord/" method="post" >
+            <!--div class="mb-3 mt-3">
+                <label for="Table" class="form-label">Table:</label>
+                <input type="Table" class="form-control" id="Table" placeholder="Enter Table" name="Table" ng-model="item.table">
+            <div-->
+            <div class="mb-3 mt-3">
+                <label for="Title" class="form-label">Title:</label>
+                <input type="Title" class="form-control" id="Title" placeholder="Enter Title" name="Title" ng-model="item.title">
+            </div>
+
+            <div class="mb-3 mt-3">
+                <label for="CreateGrpId" class="form-label">Create Access(Group):</label>
+                <select class="CreateGrpId form-control"  multiple="multiple" ng-model="CreateGrpId">
+                    <option ng-repeat="g in grps" value="{{g.id}}" >{{g.name}}</option>
+                </select>
+            </div>
+
+            <div class="mb-3 mt-3" ng-show="item.id">
+                <label for="CreateGrpId" class="form-label">Status:</label>
+
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th style="width:40%">Title</th>
+                        </tr>
+                        <td></td>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="st in statusList" >
+                            <td> {{st.status}}</td>
+                            <td>
+                                
+                                <button type="button" class="btn btn-danger" ng-click="EditStatus(st)" >
+                                    <span class="glyphicon glyphicon-remove"></span>Edit
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="Text" class="form-control" id="Title" placeholder="Enter Status" name="Title" ng-model="editStatus.status">
+                            </td>
+                            <td>
+                                <input class="btn btn-primary" type="button" value="{{editStatus.id ? 'Update' : 'Save new Status'}}" ng-click="AddUpateStatus(editStatus)" />
+                                <input ng-show="editStatus.id" class="btn btn-danger" type="button" value="Remove" ng-click="AddUpateStatus(editStatus, true)" />
+                                <input ng-show="editStatus.id" class="btn btn-primary" type="button" value="Add new Status" ng-click="NewStatus()" />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mb-3 mt-3" ng-show="item.id">
+                <label for="CreateGrpId" class="form-label">Access:</label>
+                <table class="table table-bordered table-sm">
+                    <thead>
+                        <tr>
+                        <th style="width:20%">Status</th>
+                        <th style="width:10%">Type(Group/Field)</th>
+                        <th style="width:30%">Group/Field</th>
+                        <th style="width:30%">Access(V/R/W)</th>
+                        <th style="width:10%"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="ac in Access" >
+                            <td>
+                                <select class="Status{{$index}} form-control"  ng-model="ac.Status" multiple="multiple" >
+                                    <option ng-repeat="st in statusList" value="{{st.id}}" >{{st.Status}}</option>                                      
+                                </select>
+                            </td>
+
+                            <td>
+                                <select class="form-control"  ng-model="ac.Type">
+                                    <option value='Group'>Group</option>
+                                    <option value='Field'>Field</option>                                            
+                                </select>
+                            </td>
+
+                            <td>           
+                                <div ng-show="ac.Type == 'Field' "> 
+                                    <input  type="FileldsField" class="form-control" id="FileldsField" placeholder="Enter Field" name="Filelds Field" ng-model="ac.Field">
+                                </div>
+                                <div ng-show="ac.Type == 'Group' ">
+                                    <select  class="AccessGrpId{{$index}} form-control" 
+                                        multiple="multiple" ng-model="ac.Group" style="width:100%">
+                                        <option ng-repeat="g in grps" value="{{g.id}}" >{{g.name}}</option>
+                                    </select>
+                                </div>
+
+                            </td>
+
+                            <td>
+                                <select class="Access{{$index}} form-control"  ng-model="ac.Access" multiple="multiple" style="width:100%">
+                                    <option>Create</option>
+                                    <option>Read</option>  
+                                    <option>Write</option>  
+                                    <option>Delete</option>                                          
+                                </select>
+                            </td> 
+                            <td>
+                                <button type="button" class="btn btn-danger" ng-click="RemoveAccess($index)" >
+                                    <span class="glyphicon glyphicon-remove"></span> Remove
+                                </button>
+                            </td>                                   
+                        </tr>
+                        <tr>
+                            <td colspan="5" >
+                                <input class="btn btn-link" type="button" value="Add new access" ng-click="AddNewAccess()" />                                
+                            </td>
+                        </tr>   
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mb-3 mt-3" ng-show="item.id">
+                <label for="CreateGrpId" class="form-label">Fileds:</label>
+
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th style="width:40%">Title</th>
+                            <th style="width:40%">Type</th>
+                            <th style="width:20%">Required</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="fld in filedsList" >
+                            <td>
+                                <input class="btn btn-link" type="button" value="{{fld.title}}" ng-click="AddNewField(fld)" />
+                            </td>
+                            <td>{{fld.type}}</td>
+                            <td>{{fld.required ? 'Yes' : 'No'}}</td>                            
+                        </tr>
+                        <tr>
+                            <td colspan="3" >
+                                <input class="btn btn-link" type="button" value="Add New Field" ng-click="AddNewField()" />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <input type="button" value="Save" class="btn btn-primary" ng-click="Save()"/>
+            <input type="button" value="Cancel" class="btn btn-primary" ng-click="brnCacel()"/>
+
+            
+        
+        </form>
+
+        
+    <div>
+
+    <div class="modal modal-xl" tabindex="-1" id="FieldModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Access</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered" >
+                <thead>
+                    <tr>
+                        <th style="width:40%">Title</th>
+                        <th style="width:40%">Type</th>
+                        <th style="width:20%">Required</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <input type="Title" class="form-control" id="Title" placeholder="Enter Title" name="title" ng-model="NewFld.title">
+                        </td>
+    
+                        <td>
+                            <select class="form-control"  ng-model="NewFld.type">
+                                <option>Text</option>
+                                <option>Date</option>
+                                <option>User</option>
+                                <option>Number</option>                                                                
+                            </select>
+                        </td>
+    
+                        <td>           
+                            <input class="form-check-input" type="checkbox" ng-model="NewFld.required">                              
+                        </td>
+
+                    </tr>
+                </tbody>
+                </table>
+            
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <input type="button" value="Save" class="btn btn-primary" ng-click="AddUpateField(NewFld, false)"/>
+            </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+  {% endverbatim %}
+
+
+
+
+<script src="{% static 'js/common.js' %}"></script>
+<script src="{% static 'js/docApp.js' %}"></script>
+<script src="{% static 'js/AppListCtrl.js' %}"></script>
+
+{% endblock content%} 

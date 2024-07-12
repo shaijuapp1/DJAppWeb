@@ -1,0 +1,46 @@
+
+{% extends "base.html" %} 
+{% load static %}
+
+{% block title %}App List{% endblock %}
+
+{% block content %}
+
+<div class="card my-4">
+    <h5 class="card-header">
+        <div class="row "  >
+            <div class="col-sm-11 ">
+                <h4>App List</h4>
+            </div>
+            <div class="col-sm-1">
+                <a style="margin-top: 10px;" href="/applistdetails">Add New</a>
+            </div>
+        </div>
+    </h5>
+    <div class="card-body" style="padding:0px">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Table</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for itm in list %}
+                <tr >
+                    <td>{{ itm.id }}</td>
+                        <td>
+                            <a href="/applistdetails/{{ itm.id }}">{{ itm.title }}</a>
+                        </td>
+                    <td>{{ itm.table }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+    
+
+{% endblock %}
