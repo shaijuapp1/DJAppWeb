@@ -1,0 +1,50 @@
+1. Create Project
+django-admin startproject AppWeb
+
+Run Project:
+cd AppWeb
+python3 manage.py runserver
+
+
+2. Create Test App
+    a. 
+        python3 manage.py startapp App
+    b. 
+        settings.py
+        add app name in INSTALLED_APPS
+            "App",
+
+    c.
+        Update views.py
+
+    d. urls.py 
+        AppWeb/App/urls.py
+        and 
+        AppWeb/AppWeb/urls.py
+
+    e. Add AppWeb/App/admin.py
+
+3. python3  manage.py makemigrations
+4. python3  manage.py migrate
+5. Ceate admin user
+python3 manage.py createsuperuser
+
+AppWeb/AppWeb/urls.py
+    path("accounts/", include("django.contrib.auth.urls")),
+    path("", TemplateView.as_view(template_name="home.html"), name="home"),  # new
+
+
+AppWeb/AppWeb/settings.py
+LOGIN_REDIRECT_URL = "home"  
+LOGOUT_REDIRECT_URL = "/"  
+
+Login page:
+
+a. Add : AppWeb/templates/registration/login.html
+
+b. AppWeb/AppWeb/urls.py
+    path("accounts/", include("django.contrib.auth.urls")),
+c. AppWeb/AppWeb/settings.py
+    TEMPLATES:
+    'DIRS': [BASE_DIR / "templates"],
+

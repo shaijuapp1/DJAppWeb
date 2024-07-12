@@ -1,0 +1,5 @@
+PageList
+
+Page - New/Edit
+Pages - Public, by cat.
+PageView - Public read only

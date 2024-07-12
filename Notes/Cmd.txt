@@ -1,0 +1,62 @@
+11
+
+Login : amin Sh1*
+
+
+pip3 install django
+
+django-admin startproject Proj1
+
+django app
+1. python3 manage.py startapp todo 
+2. settings.py
+    add app name in INSTALLED_APPS
+     "todo",
+3. Update views.py
+
+4. urls.py in app(Proj1/todo/urls.py) - 
+5. Add - Proj1/Proj1/urls.py
+6. python3 manage.py runserver
+7. Create Template
+8. Create Model
+9.python3  manage.py makemigrations
+10. python3  manage.py migrate
+
+
+- python3 manage.py createsuperuser 
+
+======
+
+python3 manage.py startapp page
+
+settings.py
+    add app name in INSTALLED_APPS
+     "page",
+
+Create Template
+
+Create views.py
+
+urls.py in app(Proj1/todo/urls.py) 
+
+Add - Proj1/Proj1/urls.py
+     path("",include("todo.urls")),
+
+Create model
+
+Add entry in Proj1/todo/admin.py
+    admin.site.register(TodoItem)
+
+python3  manage.py makemigrations
+
+python3  manage.py migrate
+
+
+=====
+
+/Users/shaijukumarkappillilbalakrishnan/TestCode/python/django/DJ1/AppWeb/AppWeb/urls.py
+
+
+
+
+
