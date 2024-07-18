@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 
-def GettPostVal(request, key, errlst, chkNull ):
+def GettPostVal(request, key, errlst, chkNull, ToNum = 'string' ):
     val = None
     try:
         val =  request.POST[key]
@@ -9,6 +9,31 @@ def GettPostVal(request, key, errlst, chkNull ):
 
     if chkNull :
         CheckNullEmptyError(val, errlst, key)
+    
+    if ToNum == 'int':
+        try:
+            val =  int(val)
+        except:
+            if chkNull:
+                UpdateError(errlst, "Invlaid integer value for " + key)
+            val = 0
+    
+    if ToNum == 'float':
+        try:
+            val =  float(val)
+        except:
+            if chkNull:
+                UpdateError(errlst, "Invlaid float value for " + key)
+            val = 0
+    
+    if ToNum == 'bool':
+        if val.lower() == 'true':
+            val = True
+        elif val.lower() == 'false':
+            val = False
+        else:
+            if chkNull:
+                UpdateError(errlst, "Invlaid bool value(True/False) for " + key)
 
     return val
     

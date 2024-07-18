@@ -1,8 +1,27 @@
-.test{
-    color: red;
-    background-color: aqua;
-}
 
 .select2-container--open {
     z-index: 9999999
 }
+
+/* modal-full-width start*/
+
+.modal-full-width {
+    width: 97%;
+    max-width: 97%;
+  }
+  
+  .modal-full-width .modal-content {
+    width: 97%;
+    border-radius: 0;
+  }
+  
+  .modal-full-width .modal-dialog {
+    margin: 0;
+    max-width: none;
+  }
+  
+  .modal-full-width .modal-body {
+    padding: 20px; /* Adjust padding as needed */
+  }
+
+  /* modal-full-width end*/

@@ -70,38 +70,67 @@
                 <table class="table table-bordered table-sm">
                     <thead>
                         <tr>
-                        <th style="width:20%">Status</th>
-                        <th style="width:10%">Type(Group/Field)</th>
-                        <th style="width:30%">Group/Field</th>
-                        <th style="width:30%">Access(V/R/W)</th>
-                        <th style="width:10%"></th>
+                            <th style="width:20%">Name</th>
+                            <th style="width:20%">Status</th>
+                            <th style="width:20%">Filed Type</th>
+                            <th style="width:20%">Group/Field</th>
+                            <th style="width:20%">Access(V/R/W)</th>
+                            <th style="width:10%"></th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr ng-repeat="ac in Access" >
+
+                            <td>
+                                <input type="Text" class="form-control" id="FileldsField"  name="Filelds Field" ng-model="ac.name">
+                            </td>
+
                             <td>
                                 <select class="Status{{$index}} form-control"  ng-model="ac.Status" multiple="multiple" >
-                                    <option ng-repeat="st in statusList" value="{{st.id}}" >{{st.Status}}</option>                                      
+                                    <option ng-repeat="st in statusList" value="{{st.id}}" >{{st.status}}</option>                                      
                                 </select>
                             </td>
 
                             <td>
                                 <select class="form-control"  ng-model="ac.Type">
-                                    <option value='Group'>Group</option>
-                                    <option value='Field'>Field</option>                                            
+                                    <option value='UserGroup'>Group</option>
+                                    <option value='User'>Field User</option>
+                                    <option value='Group'>Group User</option>
+                                    <option value='Text'>Field Text</option>                                            
                                 </select>
                             </td>
 
-                            <td>           
-                                <div ng-show="ac.Type == 'Field' "> 
-                                    <input  type="FileldsField" class="form-control" id="FileldsField" placeholder="Enter Field" name="Filelds Field" ng-model="ac.Field">
+                            <td>                                
+                                <select  class="AccessGrpId{{$index}} form-control" ng-if="ac.Type == 'UserGroup'" 
+                                    multiple="multiple" ng-model="ac.Group" style="width:100%">
+                                    <option ng-repeat="g in grps" value="{{g.id}}" >{{g.name}}</option>
+                                </select>
+
+                                <select class="form-control" ng-model="NewFlw.action_by_filed"
+                                    ng-if="ac.Type != 'UserGroup'">
+                                    <option ng-repeat="fld in filedsList | filter:{ type: ac.Type } " value="{{fld.id}}" >{{fld.title}}</option>
+                                </select>
+
+                                <div ng-show="ac.Type == 'Text'">
+                                    <div style="width100%;text-align: center;">=</div>
+                                    <input type="Text" class="form-control" id="FileldsField" placeholder="Text Value" 
+                                     name="Filelds Field" ng-model="ac.Field">
                                 </div>
+                                
+                            <!--
+                                <div ng-show="ac.Type == 'Field User' "> 
+                                    <input  type="Text" class="form-control" id="FileldsField" placeholder="Enter Field" name="Filelds Field" ng-model="ac.Field">
+
+                                        
+                                </div>
+
                                 <div ng-show="ac.Type == 'Group' ">
                                     <select  class="AccessGrpId{{$index}} form-control" 
                                         multiple="multiple" ng-model="ac.Group" style="width:100%">
                                         <option ng-repeat="g in grps" value="{{g.id}}" >{{g.name}}</option>
                                     </select>
-                                </div>
+                                </div >
+                            -->
 
                             </td>
 
@@ -120,7 +149,7 @@
                             </td>                                   
                         </tr>
                         <tr>
-                            <td colspan="5" >
+                            <td colspan="6" >
                                 <input class="btn btn-link" type="button" value="Add new access" ng-click="AddNewAccess()" />                                
                             </td>
                         </tr>   
@@ -134,13 +163,15 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr>
+                            <th style="width:4%">Ord</th>
                             <th style="width:40%">Title</th>
                             <th style="width:40%">Type</th>
                             <th style="width:20%">Required</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="fld in filedsList" >
+                        <tr ng-repeat="fld in filedsList | orderBy:'order'" >
+                            <td>{{fld.order}}</td>
                             <td>
                                 <input class="btn btn-link" type="button" value="{{fld.title}}" ng-click="AddNewField(fld)" />
                             </td>
@@ -148,8 +179,48 @@
                             <td>{{fld.required ? 'Yes' : 'No'}}</td>                            
                         </tr>
                         <tr>
-                            <td colspan="3" >
+                            <td colspan="4" >
                                 <input class="btn btn-link" type="button" value="Add New Field" ng-click="AddNewField()" />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mb-3 mt-3" ng-show="item.id">
+                <label for="CreateGrpId" class="form-label">Flows:</label>
+
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th style="width:4%">Ord</th>
+                            <th style="width:17%">From status</th>                            
+                            <th style="width:17%">Action by type</th>
+                            <th style="width:17%" ng-show="NewFlw.action_by_type == 'Group' " >Action by Group</th>
+                            <th style="width:17%" ng-show="NewFlw.action_by_type == 'Field' " >Action by Filed</th>
+                            <th style="width:20%">Action</th>
+                            <th style="width:17%">To status</th>
+                            <th style="width:12%">Custom action</th>
+                        </tr>
+                    </thead>
+                    <tbody>                        
+                        <tr ng-repeat="flw in flowsList | orderBy:'order' " >
+                            <td>{{flw.order}}</td>
+                            <td>{{GetStatusText(flw.from_status)}}</td>
+                            <td>{{flw.action_by_type}}</td>
+                            <td>
+                                <span ng-show="NewFlw.action_by_type == 'Filed' " >{{flw.action_by_filed}}</span>
+                                <span ng-show="NewFlw.action_by_type == 'Group' " >{{GetGroupText(flw.action_by_grp)}}</span>
+                            </td>                            
+                            <td>
+                                <input class="btn btn-link" type="button" value="{{flw.action}}" ng-click="AddNewFlow(flw)" />
+                            </td>
+                            <td>{{GetStatusText(flw.to_status)}}</td>
+                            <td>{{flw.custom_action ? "Yes" : "No"}}</td>                                                        
+                        </tr>
+                        <tr>
+                            <td colspan="6" >
+                                <input class="btn btn-link" type="button" value="Add New Flow" ng-click="AddNewFlow()" />
                             </td>
                         </tr>
                     </tbody>
@@ -159,15 +230,11 @@
             <input type="button" value="Save" class="btn btn-primary" ng-click="Save()"/>
             <input type="button" value="Cancel" class="btn btn-primary" ng-click="brnCacel()"/>
 
-            
-        
-        </form>
-
-        
+        </form>        
     <div>
 
-    <div class="modal modal-xl" tabindex="-1" id="FieldModal">
-        <div class="modal-dialog">
+    <div class="modal modal-xl" tabindex="-1" id="FieldModal" >
+        <div class="modal-dialog modal-full-width" style="width: 1600px;">
             <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Access</h5>
@@ -177,6 +244,7 @@
                 <table class="table table-bordered" >
                 <thead>
                     <tr>
+                        <th style="width:5%">Order</th>
                         <th style="width:40%">Title</th>
                         <th style="width:40%">Type</th>
                         <th style="width:20%">Required</th>
@@ -184,6 +252,9 @@
                 </thead>
                 <tbody>
                     <tr>
+                        <td>
+                            <input type="number" class="form-control" id="order" name="order" ng-model="NewFld.order">
+                        </td>
                         <td>
                             <input type="Title" class="form-control" id="Title" placeholder="Enter Title" name="title" ng-model="NewFld.title">
                         </td>
@@ -209,6 +280,174 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <input type="button" value="Save" class="btn btn-primary" ng-click="AddUpateField(NewFld, false)"/>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal modal-xl" tabindex="-1" id="FlowModal">
+        <div class="modal-dialog modal-full-width ">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Flow</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                    <table class="table table-bordered" >
+                        <thead>
+                            <tr>
+                                <th style="width:5%">Order</th>
+                                <th style="width:20%">From status</th>
+                                <th style="width:15%">Action by type</th>
+                                <th style="width:20%" ng-show="NewFlw.action_by_type == 'Group' " >Action by Group</th>
+                                <th style="width:20%" ng-show="NewFlw.action_by_type == 'Field' " >Action by Filed</th>
+                                <th style="width:20%">Action</th>
+                                <th style="width:20%">To status</th>
+                               
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <input type="number" class="form-control" id="order" name="order" ng-model="NewFlw.order">
+                                </td>
+                                <td>
+                                    <select class="form-control"  ng-model="NewFlw.from_status">
+                                        <option ng-repeat="st in statusList" value="{{st.id}}" >{{st.status}}</option>                                                              
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="action_by_type form-control"  ng-model="NewFlw.action_by_type" style="width:100%">
+                                        <option>Group</option>
+                                        <option>Field</option>                                          
+                                    </select>
+                                </td>
+                                <td  >                                
+                                    <select class="CreateGrpId form-control" ng-model="NewFlw.action_by_grp"
+                                        ng-if="NewFlw.action_by_type == 'Group' ">
+                                        <option ng-repeat="g in grps" value="{{g.id}}" >{{g.name}}</option>
+                                    </select>
+
+                                    <select class="form-control" ng-model="NewFlw.action_by_filed"
+                                        ng-if="NewFlw.action_by_type == 'Field' ">
+                                        <option ng-repeat="fld in filedsList | filter:{ type: 'User' } " value="{{fld.id}}" >{{fld.title}}</option>
+                                    </select>
+
+                                </td>
+                                <td>
+                                    <input type="Text" class="form-control" id="action" name="action" ng-model="NewFlw.action">
+                                </td>
+                                <td>
+                                    <select class="form-control"  ng-model="NewFlw.to_status">
+                                        <option ng-repeat="st in statusList" value="{{st.id}}" >{{st.status}}</option>                                                              
+                                    </select>
+                                </td>
+                                
+
+                            </tr>
+                            <tr >
+                                <th colspan='2'>Update Fields</th>
+                                <td colspan='4'>
+                                    <textarea class="form-control" id="custom_action" rows="6" ng-model="NewFlw.custom_action" ></textarea>
+                                </td>
+                            </tr>
+                            <tr >
+                                <th colspan='2'>Custom action</th>
+                                <td colspan='4'>
+                                    <textarea class="form-control" id="custom_action" rows="6" ng-model="NewFlw.custom_action" ></textarea>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+            
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <input type="button" value="Save" class="btn btn-primary" ng-click="AddUpateFlow(NewFlw, false)"/>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal modal-xl" tabindex="-1" id="AccessModal">
+        <div class="modal-dialog modal-full-width ">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Access</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                    <table class="table table-bordered" >
+                        <thead>
+                            <tr>
+                                <th style="width:5%">Order</th>
+                                <th style="width:20%">From status</th>
+                                <th style="width:15%">Action by type</th>
+                                <th style="width:20%" ng-show="NewFlw.action_by_type == 'Group' " >Action by Group</th>
+                                <th style="width:20%" ng-show="NewFlw.action_by_type == 'Field' " >Action by Filed</th>
+                                <th style="width:20%">Action</th>
+                                <th style="width:20%">To status</th>
+                               
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <input type="number" class="form-control" id="order" name="order" ng-model="NewFlw.order">
+                                </td>
+                                <td>
+                                    <select class="form-control"  ng-model="NewFlw.from_status">
+                                        <option ng-repeat="st in statusList" value="{{st.id}}" >{{st.status}}</option>                                                              
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="action_by_type form-control"  ng-model="NewFlw.action_by_type" style="width:100%">
+                                        <option>Group</option>
+                                        <option>Field</option>                                          
+                                    </select>
+                                </td>
+                                <td  >                                
+                                    <select class="CreateGrpId form-control" ng-model="NewFlw.action_by_grp"
+                                        ng-if="NewFlw.action_by_type == 'Group' ">
+                                        <option ng-repeat="g in grps" value="{{g.id}}" >{{g.name}}</option>
+                                    </select>
+
+                                    <select class="form-control" ng-model="NewFlw.action_by_filed"
+                                        ng-if="NewFlw.action_by_type == 'Field' ">
+                                        <option ng-repeat="fld in filedsList | filter:{ type: 'User' } " value="{{fld.id}}" >{{fld.title}}</option>
+                                    </select>
+
+                                </td>
+                                <td>
+                                    <input type="Text" class="form-control" id="action" name="action" ng-model="NewFlw.action">
+                                </td>
+                                <td>
+                                    <select class="form-control"  ng-model="NewFlw.to_status">
+                                        <option ng-repeat="st in statusList" value="{{st.id}}" >{{st.status}}</option>                                                              
+                                    </select>
+                                </td>
+                                
+
+                            </tr>
+                            <tr >
+                                <th colspan='2'>Update Fields</th>
+                                <td colspan='4'>
+                                    <textarea class="form-control" id="custom_action" rows="6" ng-model="NewFlw.custom_action" ></textarea>
+                                </td>
+                            </tr>
+                            <tr >
+                                <th colspan='2'>Custom action</th>
+                                <td colspan='4'>
+                                    <textarea class="form-control" id="custom_action" rows="6" ng-model="NewFlw.custom_action" ></textarea>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+            
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <input type="button" value="Save" class="btn btn-primary" ng-click="AddUpateFlow(NewFlw, false)"/>
             </div>
             </div>
         </div>

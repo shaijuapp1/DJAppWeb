@@ -9,6 +9,7 @@ class AppStatus(models.Model):
   id = models.AutoField(primary_key=True)
   app_id = models.IntegerField(default=0)
   status = models.CharField(max_length=200)
+  order = models.IntegerField(default=0)
   
   def __str__(self):
         return str(self.id) + " : " + str(self.app_id) + " : " + self.status
@@ -21,17 +22,17 @@ class AppStatus(models.Model):
       id = GettPostVal(request, 'id', err, False )
       app_id = GettPostVal(request, 'app_id', err, True  )
       status = GettPostVal(request, 'status', err, True  )
+      order = GettPostVal(request, 'order', err, False, 'int'  )
 
       if not id: #New item
             if not err['msg']:
-                  item = AppStatus(status = status, app_id = app_id)
+                  item = AppStatus(status = status, app_id = app_id, order = order)
                   item.save()
-                  return api_responce(item.id, 0)
-            
+                  return api_responce(item.id, 0)            
       else:
             item = AppStatus.objects.get(id=id)
-            #item.appid = appid
             item.status = status
+            item.order = order
             item.save()
             return api_responce(item.id, 0)
       

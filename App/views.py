@@ -8,14 +8,14 @@ from rest_framework.response import Response
 from django.core.serializers import serialize
 import json
 
-from  App.commonpy.serializers import GroupSerializer, StatusSerializer, FieldSerializer
+from  App.commonpy.serializers import GroupSerializer, StatusSerializer, FieldSerializer, AppFlowSerializer
 from django.contrib.auth.decorators import login_required
 from .AppList import AppList
 from .AppStatus import AppStatus
 from django.contrib.auth.models import Group
 from App.commonpy.ComonFun import GettPostVal
 from .AppFileds import AppFileds
-
+from .AppFlow import AppFlow
 
 
 @login_required(login_url="/accounts/login/")
@@ -108,7 +108,6 @@ def get_field_list_ajax(request):
     appid = request.POST['appid']
     items = AppFileds.objects.filter(app_id=appid)
     serializer = FieldSerializer(items, many=True)
-
     data = {
         'items': serializer.data
     }
@@ -116,11 +115,32 @@ def get_field_list_ajax(request):
     response.status_code = 200
     return response
 
+# Flow Start
+
+def app_flow_update_ajax(request):
+    return AppFlow.app_flow_update_ajax(request)
+
+def get_flow_list_ajax(request):
+    appid = request.POST['appid']
+    items = AppFlow.objects.filter(app_id=appid)
+    try:
+        serializer = AppFlowSerializer(items, many=True)
+        data = {
+            'items': serializer.data
+        }
+        response = JsonResponse(data)
+        response.status_code = 200
+        return response
+
+    except Exception as e:
+        #return api_responce(id, 1, str(e))
+        s = str(e)
+    
+    
+
+# Flow end
 
 #Data API
-
-
-#Data API - end
 
 def take_action(request):
     err = {'msg': ''}
@@ -140,3 +160,5 @@ def get_list(request):
     col_json = GettPostVal(request, 'col_json', err, True ) 
     filter_json = GettPostVal(request, 'filter_json', err, True  )
     return ''
+
+#Data API - end
