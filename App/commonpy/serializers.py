@@ -4,6 +4,7 @@ from django.contrib.auth.models import Group
 from App.AppStatus import AppStatus
 from App.AppFileds import AppFileds
 from App.AppFlow import AppFlow
+from App.AppAccess import AppAccess
 
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
@@ -25,6 +26,7 @@ class FieldSerializer(serializers.ModelSerializer):
                     'type', 
                     'required', 
                     'db_field',
+                    'access',
                     'order'
                  ] 
 
@@ -43,4 +45,19 @@ class AppFlowSerializer(serializers.ModelSerializer):
                     'custom_action',
                     'order'
                  ] 
-        
+
+class AppAccessSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AppAccess
+        fields = [
+                    'id',
+                    'app_id', 
+                    'order',
+                    'name', 
+                    'status', 
+                    'type', 
+                    'group', 
+                    'action_by_filed', 
+                    'field', 
+                    'access' 
+                 ] 

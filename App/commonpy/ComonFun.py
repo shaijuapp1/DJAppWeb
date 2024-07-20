@@ -87,3 +87,12 @@ def api_responce(id, status, error_essage = None, details = None):
     response = JsonResponse(data, safe=False)
     response.status_code = 200 
     return response
+
+def save_model_and_api_responce(item, id = None):
+    try: 
+        item.save()
+        return api_responce(item.id, 0)
+    except Exception as e:
+        return api_responce(id, 1, str(e))
+    
+    

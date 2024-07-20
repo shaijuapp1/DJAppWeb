@@ -9,9 +9,7 @@ docApp.controller("AppListCtrl", function($scope) {
         $scope.newItem = true
         var id = window.location.pathname.split('/')[2]
         var data = {};
-        if(id){
-            $scope.statusList = GetStatusList(id)
-            
+        if(id){                        
             $scope.newItem = false
             data.id = id
             data.csrfmiddlewaretoken = $('input[name=csrfmiddlewaretoken]').val() 
@@ -31,6 +29,12 @@ docApp.controller("AppListCtrl", function($scope) {
                     console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
                 }
             });
+
+            $scope.InitStatus(true)
+            $scope.InitAccess(true)
+            $scope.InitField(true)
+            $scope.InitFlow(true)
+
         }
         else{
             $scope.item = {}
@@ -44,25 +48,7 @@ docApp.controller("AppListCtrl", function($scope) {
         }
         else{
             $scope.CreateGrpId = angular.fromJson($scope.item.create_goup_id);
-        } 
-
-        if(!$scope.item.access){
-            $scope.Access = []
-        }
-        else{
-            $scope.Access = angular.fromJson($scope.item.access);
-            setTimeout(function(){ 
-                for(i=0; i<$scope.Access.length; i++){
-                    id =  i + "";
-                    $('.Status' + id ).select2();
-                    $('.Access' + id ).select2();
-                    $('.AccessGrpId' + id ).select2();                                        
-                }
-            })
-        }
-        $('.NewAccessStatus' ).select2()
-        $('.NewAccess' ).select2()
-        $('.NewAccessGrpId' ).select2()
+        }        
         
         if(!$scope.item.filelds){
             $scope.Filelds = []
@@ -71,11 +57,9 @@ docApp.controller("AppListCtrl", function($scope) {
             $scope.Filelds = angular.fromJson($scope.item.filelds); 
         } 
 
-        $scope.InitStatus()
-        $scope.InitField(true)
-        $scope.InitFlow(true)
+        
 
-        scopeApply()
+        scopeApply($scope)
     }
 
     $scope.brnCacel = function() {
@@ -88,9 +72,8 @@ docApp.controller("AppListCtrl", function($scope) {
         var req = $scope.item
         req.csrfmiddlewaretoken = $('input[name=csrfmiddlewaretoken]').val()
 
-        req.create_goup_id = angular.toJson($scope.CreateGrpId);
-        req.filelds = angular.toJson($scope.Filelds);
-        req.access = angular.toJson($scope.Access);
+        req.create_goup_id = angular.toJson($scope.CreateGrpId)
+        req.access = angular.toJson($scope.access_list);
 
         $.ajax({
             url : url, 
@@ -104,14 +87,12 @@ docApp.controller("AppListCtrl", function($scope) {
                         window.location.href = '/applistdetails/' + res.id
                     }
                     else{
-
+                        $.alert('Saved.')
                     }
-                    //window.location.href = '/applist ';
-                    alert('done')
+                    
                 }
                 else{
-                    $.alert(res.ErrorMessage)
-                    $('#post-text').val(res.ErrorMessage);
+                    $.alert(res.error_essage)
                 }
                 $('#post-text').val(''); 
                 console.log(res);                 
@@ -126,66 +107,68 @@ docApp.controller("AppListCtrl", function($scope) {
         });
     }
 
-    
-
-    $scope.RemoveField = function(id){        
-        $scope.Filelds.splice(id,1)
-    }
-
-    $scope.EditStatus = function(stItem){
-        debugger
-        $scope.editStatus = stItem
-    }
-
-    $scope.InitStatus = function(){
-        $scope.editStatus = {}
-        $scope.editStatus.id = null
-        $scope.editStatus.app_id = $scope.item.id
-        $scope.editStatus.status = ''
-        scopeApply()
-    }
-
-    $scope.AddUpateStatus = function(stItem, remove){
-
-        debugger
-        url = "/appstatusupdate"
-        if(remove){
-            url = "/deleteappstatus"
-        }
-
-        stItem.csrfmiddlewaretoken = $('input[name=csrfmiddlewaretoken]').val()
-
-        $.ajax({
-            url : url, 
-            type : "POST",
-            data : stItem,
-            async:false,
-            success : function(res) {
-                debugger
-                if(res.status == 0){
-                    $scope.statusList = GetStatusList($scope.item.id)
-                    $scope.InitStatus()
-                }
-                else{
-                    $.alert(res.ErrorMessage)
-                }
-            },
-            // handle a non-successful response
-            error : function(xhr,errmsg,err) {
-                alert('Error' + err)
-                debugger
-                console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
-            }
-        });
-    }
-
     $scope.GetStatusText = function(id){
         res = ''
-        for( i = 0;i< $scope.statusList.length;i++){
-            if($scope.statusList[i].id == id ){
-                res = $scope.statusList[i].status
+        for( i = 0;i< $scope.status_list.length;i++){
+            if($scope.status_list[i].id == id ){
+                res = $scope.status_list[i].status
                 break
             }
+        }
+        return res
+    }
+
+    $scope.GetStatusListText = function(itmls){
+        res = ''
+        if(itmls){
+            itms = angular.fromJson(itmls);
+            itms.forEach(function(itm, index, array) {
+    
+                for( i = 0;i< $scope.status_list.length;i++){
+                    if($scope.status_list[i].id == itm ){
+                        if(res)
+                            res += ", "
+                        res += $scope.status_list[i].status
+                        break
+                    }
+                }
+            });
+        }
+        
+        
+        return res
+    }
+
+    $scope.GetGroupListText = function(grp){
+        res = ''
+        if(grp){
+            grps = angular.fromJson(grp);
+            grps.forEach(function(grp, index, array) {
+    
+                for( i = 0;i< $scope.grps.length;i++){
+                    if($scope.grps[i].id == grp ){
+                        if(res)
+                            res += ", "
+                        res += $scope.grps[i].name
+                        break
+                    }
+                }
+            });
+        }
+        
+        
+        return res
+    }
+
+    $scope.GetAccessListText = function(itmls){
+        res = ''
+        if(itmls){
+            itms = angular.fromJson(itmls)
+            itms.forEach(function(itm, index, array) {
+                if(res)
+                    res += ", "
+                res += itm               
+            });
         }
         return res
     }
@@ -213,14 +196,15 @@ docApp.controller("AppListCtrl", function($scope) {
             $scope.NewFld.app_id = $scope.item.id
             $scope.NewFld.title = ''
             $scope.NewFld.type = ''
-            $scope.NewFld.tequired = false
+            $scope.NewFld.required = false
+            $scope.NewFld.access = ''
             $scope.NewFld.order = 0
         }
         
         if(refreshList){
             $scope.filedsList = GetFiledsList($scope.item.id)
         }
-        scopeApply()
+        scopeApply($scope)
     }
 
     function GetFiledsList(appid){
@@ -249,7 +233,7 @@ docApp.controller("AppListCtrl", function($scope) {
         obj = {...fld}
         $scope.InitField(false, obj)
         $('#FieldModal').modal('show')
-        scopeApply()
+        scopeApply($scope)
     }
     
     $scope.AddUpateField = function(stItem, remove){
@@ -291,7 +275,6 @@ docApp.controller("AppListCtrl", function($scope) {
     //Flow functions
 
     function GetFlowsList(appid){
-        debugger
         var res = {}
         var data = {};
         data.appid = appid
@@ -313,14 +296,14 @@ docApp.controller("AppListCtrl", function($scope) {
         return res;
     }
 
-    $scope.InitFlow = function(refreshList, flw){
+    $scope.InitFlow = function(refreshList, obj){
         
-        if(flw && 'app_id' in obj){
+        if(obj && 'app_id' in obj){
 
             flw = {...obj}
             flw.from_status = '' + flw.from_status
             flw.action_by_grp = '' + flw.action_by_grp
-            flw.to_status = '' + flw.from_status
+            flw.to_status = '' + flw.to_status
             flw.action_by_filed = '' + flw.action_by_filed
 
             $scope.NewFlw = flw
@@ -341,7 +324,7 @@ docApp.controller("AppListCtrl", function($scope) {
         if(refreshList){
             $scope.flowsList = GetFlowsList($scope.item.id)
         }
-        scopeApply()
+        scopeApply($scope)
     }
 
     $scope.AddNewFlow = function(fld){
@@ -391,30 +374,201 @@ docApp.controller("AppListCtrl", function($scope) {
 
     //Access functions - start
 
-    $scope.AddNewAccess = function(){
-
-        var ac = {}
-        ac.Status = ''
-        ac.Type = 'UserGroup'
-        ac.Field = ''
-        ac.Group = ''
-        ac.Access = ''
-
-        $scope.Access.push(ac)
-
-        setTimeout(function(){ 		
-            id =  $scope.Access.length-1 + "";
-            $('.Status' + id ).select2();
-            $('.Access' + id ).select2();
-            $('.AccessGrpId' + id ).select2();
-    	}, 50);
-
-        //$scope.$apply()
+    function GetAccessList(appid){
+        var res = {}
+        var data = {};
+        data.appid = appid
+        data.csrfmiddlewaretoken = $('input[name=csrfmiddlewaretoken]').val() 
+        url = "/getaccesslist"
+        $.ajax({
+            url : url, 
+            type : "POST", 
+            data : data,
+            async : false,
+            success : function(json) {
+                json.items.forEach(function(itm, index, array) {
+                    itm.status = angular.fromJson(itm.status)
+                    itm.group = angular.fromJson(itm.group)
+                    itm.access = angular.fromJson(itm.access)
+                })
+                res = json.items
+            },
+            error : function(xhr,errmsg,err) {
+                //debugger
+                console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+            }
+        });
+        return res;
     }
 
-    $scope.RemoveAccess = function(id){        
-        $scope.Access.splice(id,1)
+    $scope.InitAccess = function(refreshList, obj){
+        
+        if(obj && 'app_id' in obj){
+            $scope.new_acc = {...obj}
+            $scope.new_acc.action_by_filed = '' + $scope.new_acc.action_by_filed
+        }
+        else{
+            $scope.new_access = true
+            $scope.new_acc = {}
+            $scope.new_acc.app_id = $scope.item.id
+            $scope.new_acc.order = 0
+            $scope.new_acc.name = ''
+            $scope.new_acc.status = ''
+            $scope.new_acc.type = 'UserGroup'
+            $scope.new_acc.group = ''
+            $scope.new_acc.action_by_filed = ''
+            $scope.new_acc.field = ''
+            $scope.new_acc.access = ''
+        }
+        
+        if(refreshList && $scope.item.id){
+            $scope.access_list = GetAccessList($scope.item.id)
+        }
+
+        setTimeout(function(){ 		
+            $('.new_acc_status' ).select2()
+            $('.new_acc_group' ).select2()
+            $('.new_acc_ccess' ).select2()  
+        }, 50);
+
+        scopeApply($scope)
+    }
+
+    $scope.AddNewAccess = function(acc){        
+        obj = {...acc}
+        $scope.InitAccess(false, obj)
+        if(!$scope.access_list.order)
+            $scope.new_acc.order = $scope.access_list.length + 1 
+        $('#access_model').modal('show')        
+    }
+
+    $scope.DeleteAccess = function(stItem){
+        $.confirm({
+            title: 'Confirm!',
+            content: 'Do yo want to delete!',
+            buttons: {
+                Cancel: function () {
+                },
+                Delete: function () {
+                    $scope.AddUpateAccess(stItem, true)
+                }
+            }
+        });
+    }
+
+    $scope.AddUpateAccess = function(stItem, remove){
+
+        debugger
+        url = "/appsaccessupdate"
+        if(remove){
+            url = "/deleteappaccess"
+        }
+        stItem.csrfmiddlewaretoken = $('input[name=csrfmiddlewaretoken]').val()
+        var obj = {...stItem}
+        obj.status =  angular.toJson(obj.status)
+        obj.group =  angular.toJson(obj.group)
+        obj.access =  angular.toJson(obj.access)
+
+        $.ajax({
+            url : url, 
+            type : "POST",
+            data : obj,
+            async:false,
+            success : function(res) {
+                debugger
+                if(res.status == 0){
+                    $scope.InitAccess(true)
+                    $('#access_model').modal('hide')
+                }
+                else{
+                    $.alert(res.error_essage)
+                }
+            },
+            error : function(xhr,errmsg,err) {
+                alert('Error' + err)
+                debugger
+                console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+            }
+        });
     }
 
     //Access functions - end
+
+    //Status functions - start
+    
+    $scope.InitStatus = function(refreshList, obj){
+        
+        if(obj && 'app_id' in obj){
+
+            $scope.new_st = {...obj}
+        }
+        else{
+            $scope.new_st = {}
+            $scope.new_st.app_id = $scope.item.id
+            $scope.new_st.status = ''
+            $scope.new_st.order = 0
+        }
+        
+        if(refreshList && $scope.item.id){
+            $scope.status_list = GetStatusList($scope.item.id)
+        }
+        scopeApply($scope)
+    }
+
+    $scope.AddNewStatus = function(itm){
+        obj = {...itm}
+        $scope.InitStatus(false, obj)
+        if(!$scope.new_st.order)
+            $scope.new_st.order = $scope.status_list.length + 1 
+        $('#status_model').modal('show')
+    }
+
+    $scope.DeleteStatus = function(stItem){
+        $.confirm({
+            title: 'Confirm!',
+            content: 'Do yo want to delete!',
+            buttons: {
+                Cancel: function () {
+                },
+                Delete: function () {
+                    $scope.AddUpateStatus(stItem, true)
+                }
+            }
+        });
+    }
+
+    $scope.AddUpateStatus = function(stItem, remove){
+
+        debugger
+        url = "/appstatusupdate"
+        if(remove){
+            url = "/deleteappstatus"
+        }
+        stItem.csrfmiddlewaretoken = $('input[name=csrfmiddlewaretoken]').val()
+        $.ajax({
+            url : url, 
+            type : "POST",
+            data : stItem,
+            async:false,
+            success : function(res) {
+                debugger
+                if(res.status == 0){
+                    $scope.InitStatus(true)
+                    $('#status_model').modal('hide')
+                }
+                else{
+                    $.alert(res.error_essage)
+                }
+            },
+            error : function(xhr,errmsg,err) {
+                alert('Error' + err)
+                debugger
+            }
+        });
+    }
+
+
+     //Status functions - end
+
+    
 });

@@ -5,7 +5,7 @@ from django.contrib.auth.models import Group
 import json
 from django.http import JsonResponse
 
-from App.commonpy.ComonFun import GettPostVal, UpdateError, HasUniqueAttribute, GettObjVal, CheckItemExitsInObjArray,api_responce
+from App.commonpy.ComonFun import GettPostVal, UpdateError, HasUniqueAttribute, GettObjVal, CheckItemExitsInObjArray,api_responce, save_model_and_api_responce
 from .AppFileds import AppFileds
 
 
@@ -34,25 +34,28 @@ class AppList(models.Model):
     title = GettPostVal(request, 'title', err, True  )
     create_goup_id = GettPostVal(request, 'create_goup_id', err, False  )
 
+    if err['msg']: return api_responce(None, 1, err['msg'])
+
     if not id: #New item
-      if not err['msg']:
         item = AppList(table = table, title = title, create_goup_id = create_goup_id)
-        item.save()
-        return api_responce(item.id, 0)
-      else:
-        return api_responce(None, 1, err['msg'])
+        return save_model_and_api_responce(item)
     else:
-      return
-      
-    # get AppList id from request
-    id = None
-    try:
-      id = request.POST['id']
-    except Exception as e:
-      return api_responce(id, 1, str(e))
-    
-    return ''
-  
+        access = GettPostVal(request, 'access', err, False)
+
+        if access:
+            acc =  json.loads(access)
+            unq_name = HasUniqueAttribute(acc,'name' )
+            if not unq_name:
+                  return api_responce(None, 1, "Access Name shoud be unique.")
+            
+        if err['msg']: return api_responce(id, 1, err['msg'])
+        item = AppList.objects.get(id=id)
+        item.title = title
+        item.create_goup_id = create_goup_id
+        item.access = access
+        return save_model_and_api_responce(item)
+
+
   def applist_details_ajax(request): #appdetails ajax
     err = {'msg': ''}
     id = GettPostVal(request, 'id', err, False )

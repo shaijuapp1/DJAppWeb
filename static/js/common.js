@@ -2,7 +2,7 @@ function Test(p){
     alert(p)
 }
 
-function scopeApply(){
+function scopeApply($scope){
     try {
         $scope.$apply()
     } catch (innerError) {

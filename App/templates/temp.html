@@ -1,0 +1,46 @@
+<tr>
+    <td>
+        <input type="number" class="form-control" id="order" name="order" ng-model="new_acc.order">
+    </td>
+    <td>
+        <input type="Text" class="form-control" id="new_acc_name"  name="new_acc_name" ng-model="new_acc.name">                                    
+    </td>
+    <td>
+        <select multiple="multiple" class="new_acc_status form-control"  ng-model="new_acc.status" style="width:100%">
+            <option  ng-repeat="st in status_list" value="{{st.id}}" >{{st.status}}</option>                                                              
+        </select>
+    </td>
+    <td>     
+        <select class="form-control"  ng-model="new_acc.type">
+            <option value='UserGroup'>Group</option>
+            <option value='User'>Field User</option>
+            <option value='Group'>Group User</option>
+            <option value='Text'>Field Text</option>                                            
+        </select>                                    
+    </td>
+    <td>
+        <select  class="new_acc_group form-control" ng-if="new_acc.type == 'UserGroup'" 
+            multiple="multiple" ng-model="new_acc.group" style="width:100%">
+            <option ng-repeat="g in grps" value="{{g.id}}" >{{g.name}}</option>
+        </select>
+
+        <select class="form-control" ng-model="new_acc.action_by_filed"
+            ng-if="new_acc.type != 'UserGroup'">
+            <option ng-repeat="fld in filedsList | filter:{ type: new_acc.type } " value="{{fld.id}}" >{{fld.title}}</option>
+        </select>
+
+        <div ng-show="new_acc.type == 'Text'">
+            <div style="width100%;text-align: center;">=</div>
+            <input type="Text" class="form-control" id="FileldsField" placeholder="Text Value" 
+            name="Filelds Field" ng-model="ac.field">
+        </div> 
+    </td>
+    <td>
+        <select class="new_acc_ccess form-control"  ng-model="new_acc.access" multiple="multiple" style="width:100%">
+            <option>Create</option>
+            <option>Read</option>  
+            <option>Write</option>  
+            <option>Delete</option>                                          
+        </select>
+    </td>                                
+</tr>   

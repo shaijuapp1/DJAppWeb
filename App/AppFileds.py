@@ -1,7 +1,6 @@
 from django.db import models
-from django.urls import reverse  
+from django.urls import reverse
 from App.commonpy.ComonFun import GettPostVal, api_responce
-from django.http import JsonResponse
 
 
 class AppFileds(models.Model):
@@ -10,6 +9,7 @@ class AppFileds(models.Model):
   title = models.CharField(max_length=200)
   type = models.CharField(max_length=200)
   required = models.BooleanField (default=False)
+  access = models.CharField(max_length=1000, default='')
   db_field = models.CharField(max_length=200, default='')
   order = models.IntegerField(default=0)
   
@@ -27,8 +27,9 @@ class AppFileds(models.Model):
       required = GettPostVal(request, 'required', err, False, 'bool'  )
       type = GettPostVal(request, 'type', err, True  )
       app_id = GettPostVal(request, 'app_id', err, True , 'int'  )
+      access = GettPostVal(request, 'access', err, False  )
       order = GettPostVal(request, 'order', err, False, 'int'  )
-      
+
       item = None
       apItms = None
       if id:
@@ -39,8 +40,7 @@ class AppFileds(models.Model):
                   return api_responce(None, 1, "Diffrent type, cant update type.")
       
       if not err['msg']:
-            if id:
-                  
+            if id:                  
                   apItms = AppFileds.objects.exclude(id = id).filter(app_id = app_id).filter(title = title)
             else:
                   apItms = AppFileds.objects.filter(app_id = app_id).filter(title = title)
@@ -60,7 +60,8 @@ class AppFileds(models.Model):
                               required = required, 
                               db_filed = db_field, 
                               type = type,
-                              order = order
+                              order = order,
+                              access = access
                         )
                   try:
                         item.save()
@@ -74,8 +75,10 @@ class AppFileds(models.Model):
             item.title = title
             item.required = required
             item.order = order
+            item.access = access
             item.save()
             return api_responce(item.id, 0)
+
 
 def get_next_db_field(app_id, type):
 

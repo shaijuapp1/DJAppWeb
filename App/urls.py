@@ -34,6 +34,10 @@ urlpatterns = [
     path("getflowlist", views.get_flow_list_ajax, name="getflowlist"),
     #path("deleteappflow", views.app_flow_delete_ajax, name="deleteappflow"),
 
+    path("appsaccessupdate", views.app_access_update_ajax, name="appsaccessupdate"),
+    path("getaccesslist", views.get_access_list_ajax, name="getaccesslist"),
+    path("deleteappaccess", views.app_access_delete_ajax, name="deleteappaccess"),
+
     #path("getGroupLista", views.applistDetailsAjax, name="AppDetails"), #appdetails ajax
 
 
