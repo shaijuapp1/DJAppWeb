@@ -38,6 +38,11 @@ urlpatterns = [
     path("getaccesslist", views.get_access_list_ajax, name="getaccesslist"),
     path("deleteappaccess", views.app_access_delete_ajax, name="deleteappaccess"),
 
+    path("appsviewupdate", views.app_view_update_ajax, name="appsviewupdate"),
+    path("getviewlist", views.get_view_list_ajax, name="getviewlist"),
+    path("deleteappview", views.app_view_delete_ajax, name="deleteappview"),
+    path("view/<str:appid>/<str:title>/<str:id>", views.app_view_ajax, name="view"),
+
     #path("getGroupLista", views.applistDetailsAjax, name="AppDetails"), #appdetails ajax
 
 

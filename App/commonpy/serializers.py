@@ -5,6 +5,7 @@ from App.AppStatus import AppStatus
 from App.AppFileds import AppFileds
 from App.AppFlow import AppFlow
 from App.AppAccess import AppAccess
+from App.AppView import AppView
 
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
@@ -25,10 +26,10 @@ class FieldSerializer(serializers.ModelSerializer):
                     'title', 
                     'type', 
                     'required', 
-                    'db_field',
                     'access',
+                    'db_field',                    
                     'order'
-                 ] 
+                 ]
 
 class AppFlowSerializer(serializers.ModelSerializer):
     class Meta:
@@ -60,4 +61,16 @@ class AppAccessSerializer(serializers.ModelSerializer):
                     'action_by_filed', 
                     'field', 
                     'access' 
+                 ] 
+
+class AppViewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AppView
+        fields = [
+                    'id',
+                    'app_id', 
+                    'order',
+                    'title', 
+                    'html', 
+                    'js'                    
                  ] 

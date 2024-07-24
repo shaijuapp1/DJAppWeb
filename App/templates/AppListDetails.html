@@ -40,40 +40,7 @@
                     <div class="col-lg-12 ">
                         <input class="btn btn-link" type="button" value="Add new Status" ng-click="AddNewStatus()" />
                     </div>
-                </div>
-                <!--
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th style="width:40%">Title</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr ng-repeat="st in status_list | orderBy:'order'" >
-                            <td> 
-                                <input class="btn btn-link" type="button" value="{{st.status}}" ng-click="AddNewStatus(st)" />
-                            </td>
-                            
-                            <td>                        
-                                <button type="button" class="btn btn-danger" ng-click="AddNewStatus(st)" >
-                                    <span class="glyphicon glyphicon-remove"></span>Edit
-                                </button>
-                            </td>
-                            
-                        </tr>
-                        <tr>
-                            <td>
-                                <input class="btn btn-primary" type="button" value="Add new Status" ng-click="AddNewStatus()" />
-                                
-                                <input class="btn btn-primary" type="button" value="{{editStatus.id ? 'Update' : 'Save new Status'}}" ng-click="AddNewStatus(editStatus)" />
-                                <input ng-show="editStatus.id" class="btn btn-danger" type="button" value="Remove" ng-click="AddUpateStatus(editStatus, true)" />
-                                <input ng-show="editStatus.id" class="btn btn-primary" type="button" value="Add new Status" ng-click="NewStatus()" />
-                               
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            -->
+                </div>                
             </div>
 
             <div class="mb-3 mt-3" ng-show="item.id">
@@ -140,7 +107,7 @@
                             </td>
                             <td>{{fld.type}}</td>
                             <td>{{fld.required ? 'Yes' : 'No'}}</td> 
-                            <td>{{fld.access}}</td>                           
+                            <td>{{GetAccessText(fld.access)}}</td>                           
                         </tr>
                         <tr>
                             <td colspan="4" >
@@ -160,8 +127,7 @@
                             <th style="width:4%">Ord</th>
                             <th style="width:17%">From status</th>                            
                             <th style="width:17%">Action by type</th>
-                            <th style="width:17%" ng-show="NewFlw.action_by_type == 'Group' " >Action by Group</th>
-                            <th style="width:17%" ng-show="NewFlw.action_by_type == 'Field' " >Action by Filed</th>
+                            <th style="width:17%" ng-show="NewFlw.action_by_type == 'Group' " >Group/Filed</th>
                             <th style="width:20%">Action</th>
                             <th style="width:17%">To status</th>
                             <th style="width:12%">Custom action</th>
@@ -173,7 +139,7 @@
                             <td>{{GetStatusText(flw.from_status)}}</td>
                             <td>{{flw.action_by_type}}</td>
                             <td>
-                                <span ng-show="NewFlw.action_by_type == 'Filed' " >{{flw.action_by_filed}}</span>
+                                <span>{{GetFiledText(flw.action_by_filed)}}</span>
                                 <span ng-show="NewFlw.action_by_type == 'Group' " >{{GetGroupText(flw.action_by_grp)}}</span>
                             </td>                            
                             <td>
@@ -185,6 +151,32 @@
                         <tr>
                             <td colspan="6" >
                                 <input class="btn btn-link" type="button" value="Add New Flow" ng-click="AddNewFlow()" />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mb-3 mt-3" ng-show="item.id">
+                <label for="CreateGrpId" class="form-label">View:</label>
+
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th style="width:4%">Ord</th>
+                            <th style="width:17%">View</th>                                                        
+                        </tr>
+                    </thead>
+                    <tbody>                        
+                        <tr ng-repeat="flw in view_list | orderBy:'order' " >
+                            <td>{{flw.order}}</td>
+                            <td>
+                                <input class="btn btn-link" type="button" value="{{flw.title}}" ng-click="AddNewView(flw)" />
+                            </td>                                                
+                        </tr>
+                        <tr>
+                            <td colspan="2" >
+                                <input class="btn btn-link" type="button" value="Add New View" ng-click="AddNewView()" />
                             </td>
                         </tr>
                     </tbody>
@@ -212,7 +204,7 @@
                         <th style="width:40%">Title</th>
                         <th style="width:25%">Type</th>
                         <th style="width:10%">Required</th>
-                        <th style="width:20%">Access</th>
+                        <th style="width:20%">Accesss</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -236,8 +228,8 @@
                             <input class="form-check-input" type="checkbox" ng-model="NewFld.required">                              
                         </td>
                         <td>
-                            <select class="form-control"  ng-model="NewFld.access">
-                                <option ng-repeat="ac in access_list" value="{{ac.name}}" >{{ac.name}}</option>                                                              
+                            <select class="form-control"  ng-model="NewFld.access"> 
+                                <option ng-repeat="ac in access_list" value="{{ac.id}}" >{{ac.name}}</option>                                                              
                             </select>
                         </td>
                         
@@ -451,6 +443,53 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <input type="button" value="Save" class="btn btn-primary" ng-click="AddUpateStatus(new_st, false)"/>
                 <input ng-show="new_st.id" type="button" value="Delete" class="btn btn-danger" ng-click="DeleteStatus(new_st)"/>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal modal-sm" tabindex="-1" id="view_model">
+        <div class="modal-dialog  modal-full-width">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Views</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                    <table class="table table-bordered" >                    
+                        <tbody>
+                            <tr>
+                                <th >Order</th>
+                                <td >
+                                    <input type="number" class="form-control" id="new_st_" name="new_v_Order" ng-model="new_v.order">
+                                </td>
+                            </tr>
+                            <tr >
+                                <th >Title</th>
+                                <td>
+                                    <input type="Text" class="form-control" id="new_v_title"  name="new_v_title" ng-model="new_v.title">
+                                </td>
+                            </tr>
+                           
+                            <tr>
+                                <th >Html</th>
+                                <td>
+                                    <textarea class="form-control" id="new_v_html" rows="6" ng-model="new_v.html" ></textarea>
+                                </td>
+                            </tr> 
+                            <tr >
+                                <th>JS</th>
+                                <td>
+                                    <textarea class="form-control" id="new_v_js" rows="6" ng-model="new_v.js" ></textarea>
+                                </td>
+                            </tr>                           
+                        </tbody>
+                    </table>            
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <input type="button" value="Save" class="btn btn-primary" ng-click="AddUpateView(new_v, false)"/>
+                <input ng-show="new_v.id" type="button" value="Delete" class="btn btn-danger" ng-click="DeleteView(new_v)"/>
             </div>
             </div>
         </div>

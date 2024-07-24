@@ -6,9 +6,8 @@ from django.http import JsonResponse
 from rest_framework.response import Response
 
 from django.core.serializers import serialize
-import json
 
-from  App.commonpy.serializers import GroupSerializer, StatusSerializer, FieldSerializer, AppFlowSerializer, AppAccessSerializer
+from  App.commonpy.serializers import GroupSerializer, StatusSerializer, FieldSerializer, AppFlowSerializer, AppAccessSerializer, AppViewSerializer
 from django.contrib.auth.decorators import login_required
 from .AppList import AppList
 from .AppStatus import AppStatus
@@ -17,6 +16,7 @@ from App.commonpy.ComonFun import GettPostVal
 from .AppFileds import AppFileds
 from .AppFlow import AppFlow
 from .AppAccess import AppAccess
+from .AppView import AppView
 
 @login_required(login_url="/accounts/login/")
 def home(request):
@@ -136,8 +136,6 @@ def get_flow_list_ajax(request):
         #return api_responce(id, 1, str(e))
         s = str(e)
     
-    
-
 # Flow end
 
 # Access start
@@ -162,9 +160,35 @@ def get_access_list_ajax(request):
 
 def app_access_delete_ajax(request):
     return AppAccess.app_access_delete_ajax(request)
-
-
 # Access end
+
+# View start
+def app_view_update_ajax(request):
+    return AppView.app_view_update_ajax(request)
+
+def get_view_list_ajax(request):
+    appid = request.POST['appid']
+    items = AppView.objects.filter(app_id=appid)
+    try:
+        serializer = AppViewSerializer(items, many=True)
+        data = {
+            'items': serializer.data
+        }
+        response = JsonResponse(data)
+        response.status_code = 200
+        return response
+
+    except Exception as e:
+        s = str(e)
+
+def app_view_delete_ajax(request):
+    return AppView.app_view_delete_ajax(request)
+
+def app_view_ajax(request):
+    return AppView.app_view_ajax(request)
+
+
+# View end
 
 #Data API
 

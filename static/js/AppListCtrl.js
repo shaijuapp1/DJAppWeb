@@ -34,6 +34,7 @@ docApp.controller("AppListCtrl", function($scope) {
             $scope.InitAccess(true)
             $scope.InitField(true)
             $scope.InitFlow(true)
+            $scope.InitView(true)
 
         }
         else{
@@ -160,6 +161,17 @@ docApp.controller("AppListCtrl", function($scope) {
         return res
     }
 
+    $scope.GetAccessText = function(id){
+        res = ''
+        for( i = 0;i< $scope.access_list.length;i++){
+            if($scope.access_list[i].id == id ){
+                res = $scope.access_list[i].name
+                break
+            }
+        }
+        return res
+    }
+
     $scope.GetAccessListText = function(itmls){
         res = ''
         if(itmls){
@@ -184,12 +196,26 @@ docApp.controller("AppListCtrl", function($scope) {
         return res
     }
 
+    $scope.GetFiledText = function(id){
+        res = ''
+        if(id){ 
+            for( i = 0;i< $scope.filedsList.length;i++){
+                if($scope.filedsList[i].id == id ){
+                    res = $scope.filedsList[i].title
+                    break
+                }
+            }
+        }   
+        return res
+    }
+
     //Filed functions - start
 
     $scope.InitField = function(refreshList, fld){
         //debugger
-        if(fld){
+        if(fld && 'app_id' in fld){
             $scope.NewFld = fld
+            $scope.NewFld.access = '' + $scope.NewFld.access
         }
         else{
             $scope.NewFld = {}
@@ -569,6 +595,106 @@ docApp.controller("AppListCtrl", function($scope) {
 
 
      //Status functions - end
+
+     //View functions - start
+
+    $scope.InitView = function(refreshList, view){
+        //debugger
+        if(view && 'app_id' in view){
+            $scope.new_v = view
+        }
+        else{
+            $scope.new_v = {}
+            $scope.new_v.app_id = $scope.item.id
+            $scope.new_v.title = ''
+            $scope.new_v.html = ''
+            $scope.new_v.js = ''
+            $scope.new_v.order = 0
+        }
+        
+        if(refreshList){
+            $scope.view_list = GetViewList($scope.item.id)
+        }
+        scopeApply($scope)
+    }
+
+    function GetViewList(appid){
+        var res = {}
+        var data = {};
+        data.appid = appid
+        data.csrfmiddlewaretoken = $('input[name=csrfmiddlewaretoken]').val() 
+        url = "/getviewlist"
+        $.ajax({
+            url : url, 
+            type : "POST", 
+            data : data,
+            async : false,
+            success : function(json) {
+                res = json.items
+            },
+            error : function(xhr,errmsg,err) {
+                console.log(xhr.status + ": " + xhr.responseText)
+            }
+        });
+        return res;
+    }
+
+    $scope.AddNewView = function(view){
+        obj = {...view}
+        $scope.InitView(false, obj)
+        if(!$scope.new_v.order)
+            $scope.new_v.order = $scope.view_list.length + 1 
+        $('#view_model').modal('show')
+        scopeApply($scope)
+    }
+    
+    $scope.AddUpateView = function(stItem, remove){
+
+        debugger
+        url = "/appsviewupdate"
+        if(remove){
+            url = "/deleteappview"
+        }
+
+        stItem.csrfmiddlewaretoken = $('input[name=csrfmiddlewaretoken]').val()
+
+        $.ajax({
+            url : url, 
+            type : "POST",
+            data : stItem,
+            async:false,
+            success : function(res) {
+                debugger
+                if(res.status == 0){
+                    $scope.InitView(true)
+                    $('#view_model').modal('hide')
+                }
+                else{
+                    $.alert(res.error_essage)
+                }
+            },
+            error : function(xhr,errmsg,err) {
+                alert('Error' + err)
+                debugger
+            }
+        });
+    }
+
+    $scope.DeleteView = function(stItem){
+        $.confirm({
+            title: 'Confirm!',
+            content: 'Do yo want to delete!',
+            buttons: {
+                Cancel: function () {
+                },
+                Delete: function () {
+                    $scope.AddUpateView(stItem, true)
+                }
+            }
+        });
+    }
+
+    //View functions end
 
     
 });

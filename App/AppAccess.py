@@ -84,13 +84,11 @@ class AppAccess(models.Model):
             item = AppAccess.objects.get(id=id)            
                                               
             #AppFileds
-            # items = AppFileds.objects.filter(app_id=item.app_id)
-            # for itm in items:
-            #       if str(itm.access) == id:
-            #             UpdateError(valErr, "Access is using in field" + itm.title )
-            #             break
-                 
-            if valErr['msg']: return api_responce(None, 1, valErr['msg'])                                             
+            fld = AppFileds.objects.filter(access=id)
+            if fld:
+                  UpdateError(valErr, "Access is using in field"  )     
+            if valErr['msg']: return api_responce(None, 1, valErr['msg'])    
+
             item.delete()
             return api_responce(item.id, 0)
       else:

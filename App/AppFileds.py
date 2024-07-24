@@ -9,12 +9,12 @@ class AppFileds(models.Model):
   title = models.CharField(max_length=200)
   type = models.CharField(max_length=200)
   required = models.BooleanField (default=False)
-  access = models.CharField(max_length=1000, default='')
+  access = models.IntegerField(default=0)
   db_field = models.CharField(max_length=200, default='')
   order = models.IntegerField(default=0)
   
   def __str__(self):
-        return str(self.id) + ' - ' + self.title + ' - ' + self.type + ' - ' + self.db_field+ ' - ' + str(self.app_id)
+        return str(self.id) #+ ' - ' + self.title + ' - ' + self.type + ' - ' + self.db_field + ' - ' + str(self.app_id)
   
   def get_absolute_url(self):  
      return reverse('AppStatus_edit', kwargs={'pk': self.pk})
@@ -27,7 +27,7 @@ class AppFileds(models.Model):
       required = GettPostVal(request, 'required', err, False, 'bool'  )
       type = GettPostVal(request, 'type', err, True  )
       app_id = GettPostVal(request, 'app_id', err, True , 'int'  )
-      access = GettPostVal(request, 'access', err, False  )
+      access = GettPostVal(request, 'access', err, False, 'int'  )
       order = GettPostVal(request, 'order', err, False, 'int'  )
 
       item = None
@@ -54,16 +54,16 @@ class AppFileds(models.Model):
             #get db_filed
             db_field = get_next_db_field(app_id, type)
             if db_field:
-                  item = AppFileds(
+                  try:
+                        item = AppFileds(
                               app_id = app_id, 
                               title = title, 
                               required = required, 
-                              db_filed = db_field, 
+                              db_field = db_field, 
                               type = type,
                               order = order,
                               access = access
-                        )
-                  try:
+                        )                  
                         item.save()
                   except Exception as e:
                         return api_responce(id, 1, str(e))

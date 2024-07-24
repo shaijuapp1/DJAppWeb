@@ -4,10 +4,10 @@ function Test(p){
 
 function scopeApply($scope){
     try {
-        $scope.$apply()
-    } catch (innerError) {
-        console.error('Inner Error:', innerError.message);
-    }
+        setTimeout(function(){ 		
+            $scope.$apply()
+        }, 50);        
+    } catch (innerError) {}
 }
 
 function GetUserGroups(){

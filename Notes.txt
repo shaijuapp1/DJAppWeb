@@ -1,0 +1,8 @@
+python3 manage.py runserver
+
+python3  manage.py migrate 
+
+python3  manage.py makemigrations
+
+Add app
+python3 manage.py startapp todo
