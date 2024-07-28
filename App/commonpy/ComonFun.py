@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+from django.contrib.auth.models import Group
 
 def GettPostVal(request, key, errlst, chkNull, ToNum = 'string' ):
     val = None
@@ -95,4 +96,22 @@ def save_model_and_api_responce(item, id = None):
     except Exception as e:
         return api_responce(id, 1, str(e))
     
+def is_float(value):
+    if isinstance(value, str):
+        # Remove leading/trailing whitespace and check if it's a digit or a float
+        value = value.strip()
+        if value.count('.') == 1:
+            left, right = value.split('.')
+            return (left.isdigit() or left == '') and right.isdigit()
+        return value.isdigit() or (value.count('.') == 1 and value.replace('.', '', 1).isdigit())
+    return False
     
+def check_user_in_group(request, group_id, err ):
+    if request.user.is_authenticated:
+        try:
+            group = Group.objects.get(id=group_id)
+        except Group.DoesNotExist:
+            err['msg'] = "User not exists in group " + str(group_id)
+            return False
+        return request.user.groups.filter(id=group.id).exists()
+    return False

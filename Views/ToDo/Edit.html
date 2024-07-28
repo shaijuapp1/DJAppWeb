@@ -1,0 +1,31 @@
+<div class="card my-4" ng-app="viewApp"  ng-controller="viewCtrl" ng-init="init()" >
+    <h5 class="card-header">{{item_title}}</h5>
+    <div class="card-body" style="padding:30px">
+        <form action="addrecord/" method="post" >
+            <table class="table table-bordered">
+            
+                <tbody>              
+                    <tr>
+                        <td>Title</td>
+                        <td>
+                            <input type="Text" class="form-control" id="item_title"  name="item_title" ng-model="item.title">
+                        </td>
+                    </tr> 
+                    <tr>
+                        <td>Description</td>
+                        <td>
+                            <textarea class="form-control" id="new_v_html" rows="6" ng-model="item.description" ></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">                    
+                            <input type="button" value="Save" class="btn btn-primary" ng-click="take_cation(new_v, false)"/>
+                            <input ng-show="new_v.id" type="button" value="Delete" class="btn btn-danger" ng-click="take_cation(new_v)"/>
+                            <button type="button" class="btn btn-secondary" ng-click="btn_calcel()" >Back</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>

@@ -57,7 +57,7 @@ class AppView(models.Model):
       else:
             return api_responce(None, 1,err['msg'])
   
-  def app_view_ajax(request):
+  def app_view_ajax(request,id):
       err = {'msg': ''}
-      id = GettPostVal(request, 'id', err, True )
+      item = AppView.objects.get(id=id)
        

@@ -62,7 +62,7 @@ class AppData(models.Model):
   n10 = models.FloatField(default=0.0)
 
   def __str__(self):
-        return str(self.id) + " : " + str(self.app_id) + " : " + self.status_id
+        return str(self.id) + " : " + str(self.app_id) + " : " + str(self.status_id)
   
   def get_absolute_url(self):  
      return reverse('AppStatus_edit', kwargs={'pk': self.pk})

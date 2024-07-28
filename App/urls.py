@@ -41,9 +41,13 @@ urlpatterns = [
     path("appsviewupdate", views.app_view_update_ajax, name="appsviewupdate"),
     path("getviewlist", views.get_view_list_ajax, name="getviewlist"),
     path("deleteappview", views.app_view_delete_ajax, name="deleteappview"),
-    path("view/<str:appid>/<str:title>/<str:id>", views.app_view_ajax, name="view"),
+     path("view/<str:viewid>/<str:appid>", views.app_view_ajax, name="view"), #without item id for new_req/custom_page
+    path("view/<str:viewid>/<str:appid>/<str:itemid>", views.app_view_ajax, name="view"),
 
-    #path("getGroupLista", views.applistDetailsAjax, name="AppDetails"), #appdetails ajax
+    path("appaction", views.take_action, name="takeactionabc"),
+    path("getlist", views.get_list, name="getlist"),
+
+
 
 
 

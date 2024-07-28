@@ -17,6 +17,7 @@ from .AppFileds import AppFileds
 from .AppFlow import AppFlow
 from .AppAccess import AppAccess
 from .AppView import AppView
+from .AppAction import _take_action
 
 @login_required(login_url="/accounts/login/")
 def home(request):
@@ -184,24 +185,41 @@ def get_view_list_ajax(request):
 def app_view_delete_ajax(request):
     return AppView.app_view_delete_ajax(request)
 
-def app_view_ajax(request):
-    return AppView.app_view_ajax(request)
+def app_view_ajax(request, viewid, appid, itemid=None):
+    view = AppView.objects.get(id=viewid)
+    appdetailsjs = "var appid = " + appid + "; itemid = "
+    if itemid:
+        appdetailsjs += itemid
+    else:
+        appdetailsjs += "'0'; "
 
+    appdetailsjs += "; item_title = '" +view.title + "' ;"
+    appdetailsjs += "; list_view_id = 1 ;"
+    appdetailsjs += "; item_view_id = 4 ;"
+
+    return render(request, "view.html", 
+                  {
+                      "html": view.html, 
+                      "title": view.title, 
+                      "viewjs" : view.js, 
+                      "appdetailsjs" : appdetailsjs,
+                      "appid" : appid, 
+                      "itemid" : itemid
+                  })
 
 # View end
 
 #Data API
 
 def take_action(request):
-    err = {'msg': ''}
-    list_id = GettPostVal(request, 'list_id', err, False )
-    flow_id = GettPostVal(request, 'flow_id', err, False )
-    app_id = GettPostVal(request, 'app_id', err, True  )
-    item_json = GettPostVal(request, 'col_json', err, True ) 
-    data_json = GettPostVal(request, 'filter_json', err, True  )
-
-    
-    return ''
+    return _take_action(request)
+    # err = {'msg': ''}
+    # list_id = GettPostVal(request, 'list_id', err, False )
+    # flow_id = GettPostVal(request, 'flow_id', err, False )
+    # app_id = GettPostVal(request, 'app_id', err, True  )
+    # item_json = GettPostVal(request, 'col_json', err, True ) 
+    # data_json = GettPostVal(request, 'filter_json', err, True  )
+    #return ''
 
 def get_list(request):
     err = {'msg': ''}

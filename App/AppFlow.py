@@ -5,7 +5,6 @@ from App.commonpy.ComonFun import GettPostVal, api_responce
 class AppFlow(models.Model):
   id = models.AutoField(primary_key=True)
   app_id = models.IntegerField(default=0)
-  #flow_grp = models.CharField(max_length=200)
   from_status = models.IntegerField(default=0)
   action_by_type = models.CharField(max_length=200)
   action_by_filed = models.IntegerField(default=0, null = True)
@@ -21,7 +20,6 @@ class AppFlow(models.Model):
   def get_absolute_url(self):  
      return reverse('AppList_edit', kwargs={'pk': self.pk})
   
-
   def app_flow_update_ajax(request):
       err = {'msg': ''}
       id = GettPostVal(request, 'id', err, False, 'int' )
